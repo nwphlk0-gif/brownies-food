@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brownies Food - Aesthetic Food & Calorie Tracker</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Prompt & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          colors: {
+            cocoa: {
+              50: '#FAF5F0',
+              100: '#F3E9DF',
+              200: '#E6D3C1',
+              300: '#D5B79B',
+              400: '#C19775',
+              500: '#A67954',
+              600: '#8A5D3B',
+              700: '#6E452B',
+              800: '#53311D',
+              900: '#3A1E11',
+              950: '#231008',
+            },
+            cream: {
+              50: '#FFFDF9',
+              100: '#FDF8EF',
+              200: '#FAF0DB',
+              300: '#F5E3BE',
+            },
+            caramel: {
+              400: '#E5A65D',
+              500: '#D98E3A',
+              600: '#B86F21',
+            }
+          },
+          boxShadow: {
+            'warm-sm': '0 2px 8px -2px rgba(83, 49, 29, 0.08)',
+            'warm-md': '0 8px 24px -4px rgba(83, 49, 29, 0.12)',
+            'warm-lg': '0 16px 32px -6px rgba(58, 30, 17, 0.16)',
+            'inner-glow': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.6)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #FAF5F0;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(245, 227, 190, 0.4) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(229, 166, 93, 0.15) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Glassmorphism utility */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(230, 211, 193, 0.6);
+    }
+
+    .glass-nav {
+      background: rgba(83, 49, 29, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* SVG Progress Ring Transitions */
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    /* Scrollbar Styling */
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F3E9DF;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #C19775;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #8A5D3B;
+    }
+  </style>
+</head>
+<body class="text-cocoa-900 min-h-screen pb-16 antialiased selection:bg-caramel-400 selection:text-white">
+
+  <!-- Header / Navigation Bar -->
+  <header class="glass-nav text-white sticky top-0 z-40 shadow-warm-md border-b border-cocoa-700/50">
+    <div class="max-w-6xl mx-auto px-4 md:px-8 py-3.5 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3 group cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-caramel-500 to-amber-300 p-0.5 shadow-md transform group-hover:rotate-6 transition duration-300">
+          <div class="w-full h-full bg-cocoa-900 rounded-[14px] flex items-center justify-center">
+            <i class="fa-solid fa-cookie text-amber-300 text-lg"></i>
+          </div>
+        </div>
+        <div>
+          <h1 class="font-serif text-2xl font-bold tracking-tight text-cream-100 flex items-center gap-1.5">
+            <span>Brownies</span>
+            <span class="text-caramel-400 italic font-normal text-xl">Food</span>
+          </h1>
+          <p class="text-[10px] tracking-wider text-cocoa-200 uppercase font-medium">Nutrient & Calorie Sanctuary</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center space-x-3">
+        <button id="openGoalModalBtn" class="flex items-center space-x-2 bg-gradient-to-r from-caramel-500 to-cocoa-600 hover:from-caramel-400 hover:to-cocoa-500 text-white text-xs md:text-sm font-medium px-4 py-2.5 rounded-2xl shadow-warm-sm hover:shadow-warm-md transition-all active:scale-95 border border-white/10">
+          <i class="fa-solid fa-sliders text-amber-200"></i>
+          <span class="hidden sm:inline">ตั้งเป้าหมาย</span>
+          <span class="sm:hidden">เป้าหมาย</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 md:px-8 pt-6 space-y-8">
+
+    <!-- Top Date Navigation Bar -->
+    <section class="glass-card rounded-3xl p-3 md:p-4 shadow-warm-sm flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-2">
+        <button id="prevDayBtn" class="w-10 h-10 rounded-2xl bg-cocoa-50 hover:bg-cocoa-100 text-cocoa-700 flex items-center justify-center transition active:scale-90 border border-cocoa-200/50 shadow-inner-glow">
+          <i class="fa-solid fa-chevron-left text-xs"></i>
+        </button>
+        
+        <div class="relative">
+          <input type="date" id="selectedDateInput" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10">
+          <div class="flex items-center space-x-2 bg-gradient-to-r from-cream-100 to-cocoa-50 border border-cocoa-200/80 px-4 py-2 rounded-2xl text-cocoa-800 font-semibold text-sm hover:border-caramel-400 transition shadow-inner-glow">
+            <i class="fa-regular fa-calendar-days text-caramel-500 text-base"></i>
+            <span id="dateDisplayLabel">วันนี้</span>
+            <i class="fa-solid fa-angle-down text-xs text-cocoa-400 ml-1"></i>
+          </div>
+        </div>
+
+        <button id="nextDayBtn" class="w-10 h-10 rounded-2xl bg-cocoa-50 hover:bg-cocoa-100 text-cocoa-700 flex items-center justify-center transition active:scale-90 border border-cocoa-200/50 shadow-inner-glow">
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button id="todayBtn" class="text-xs bg-cocoa-800 hover:bg-cocoa-900 text-cream-100 font-medium px-4 py-2.5 rounded-2xl transition shadow-warm-sm active:scale-95 flex items-center space-x-1.5">
+          <i class="fa-solid fa-rotate-left text-amber-300"></i>
+          <span>กลับสู่วันนี้</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Dashboard Section: Progress & Macro Cards -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Calorie Gauge Card (Left/Top 5 cols) -->
+      <div class="lg:col-span-5 glass-card rounded-3xl p-6 shadow-warm-md flex flex-col justify-between items-center relative overflow-hidden group">
+        <!-- Background Ambient Glow -->
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-amber-200/40 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-cocoa-300/30 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="w-full flex justify-between items-center mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-cocoa-500 flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-pie text-caramel-500"></i> สรุปพลังงานประจำวัน
+          </span>
+          <span id="calorieStatusBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-amber-100/80 text-cocoa-800 border border-amber-200/60 shadow-2xs">
+            อยู่ในเกณฑ์ดี
+          </span>
+        </div>
+
+        <!-- Radial Progress SVG Circle -->
+        <div class="relative w-56 h-56 my-4 flex items-center justify-center">
+          <svg class="w-full h-full transform -rotate-90 drop-shadow-md" viewBox="0 0 120 120">
+            <!-- Track Circle -->
+            <circle cx="60" cy="60" r="50" stroke="#F3E9DF" stroke-width="10" fill="transparent" />
+            <!-- Progress Circle -->
+            <circle id="ringProgressCircle" class="progress-ring-circle" cx="60" cy="60" r="50" stroke="url(#amberGradient)" stroke-width="10" stroke-dasharray="314.159" stroke-dashoffset="314.159" stroke-linecap="round" fill="transparent" />
+            <defs>
+              <linearGradient id="amberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#E5A65D" />
+                <stop offset="50%" stop-color="#D98E3A" />
+                <stop offset="100%" stop-color="#6E452B" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <!-- Inner Content -->
+          <div class="absolute flex flex-col items-center justify-center text-center">
+            <span class="text-xs text-cocoa-400 font-medium">ทานแล้ว</span>
+            <span id="totalCaloriesText" class="text-4xl font-extrabold text-cocoa-900 tracking-tight my-0.5">0</span>
+            <span class="text-xs text-cocoa-500 font-medium">/ <span id="targetCaloriesText">2000</span> kcal</span>
+          </div>
+        </div>
+
+        <!-- Remaining Stat Footer -->
+        <div class="w-full bg-gradient-to-r from-cream-100 to-cocoa-50/80 border border-cocoa-200/60 rounded-2xl p-3.5 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-2 text-cocoa-700">
+            <div class="w-8 h-8 rounded-xl bg-caramel-500/10 flex items-center justify-center text-caramel-600">
+              <i class="fa-solid fa-fire text-sm"></i>
+            </div>
+            <div>
+              <div class="font-bold text-cocoa-900 text-sm" id="remainingCaloriesText">2,000</div>
+              <div class="text-[11px] text-cocoa-500" id="remainingCaloriesLabel">แคลอรีที่เหลือทานได้</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <span id="progressPercentageText" class="font-extrabold text-caramel-600 text-sm">0%</span>
+            <div class="text-[10px] text-cocoa-400">ของเป้าหมาย</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Macro Cards & Daily Breakdown (Right/Top 7 cols) -->
+      <div class="lg:col-span-7 space-y-6 flex flex-col justify-between">
+        
+        <!-- 3 Macro Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          
+          <!-- Protein Card -->
+          <div class="glass-card rounded-3xl p-4 shadow-warm-sm border-l-4 border-l-amber-500 relative overflow-hidden group hover:-translate-y-1 transition duration-300">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold text-cocoa-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-drumstick-bite text-amber-500"></i> โปรตีน
+              </span>
+              <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">Protein</span>
+            </div>
+            <div class="flex items-baseline space-x-1 my-1">
+              <span id="totalProteinText" class="text-2xl font-extrabold text-cocoa-900">0</span>
+              <span class="text-xs text-cocoa-400">/ <span id="targetProteinText">100</span>g</span>
+            </div>
+            <!-- Progress Bar -->
+            <div class="w-full bg-cocoa-100 rounded-full h-2 overflow-hidden mt-3">
+              <div id="proteinProgressBar" class="bg-gradient-to-r from-amber-400 to-amber-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Carbs Card -->
+          <div class="glass-card rounded-3xl p-4 shadow-warm-sm border-l-4 border-l-caramel-500 relative overflow-hidden group hover:-translate-y-1 transition duration-300">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold text-cocoa-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-bowl-rice text-caramel-500"></i> คาร์โบไฮเดรต
+              </span>
+              <span class="text-[10px] bg-caramel-100 text-caramel-800 font-bold px-2 py-0.5 rounded-full">Carbs</span>
+            </div>
+            <div class="flex items-baseline space-x-1 my-1">
+              <span id="totalCarbsText" class="text-2xl font-extrabold text-cocoa-900">0</span>
+              <span class="text-xs text-cocoa-400">/ <span id="targetCarbsText">250</span>g</span>
+            </div>
+            <!-- Progress Bar -->
+            <div class="w-full bg-cocoa-100 rounded-full h-2 overflow-hidden mt-3">
+              <div id="carbsProgressBar" class="bg-gradient-to-r from-caramel-400 to-caramel-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Fat Card -->
+          <div class="glass-card rounded-3xl p-4 shadow-warm-sm border-l-4 border-l-cocoa-600 relative overflow-hidden group hover:-translate-y-1 transition duration-300">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold text-cocoa-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-droplet text-cocoa-600"></i> ไขมัน
+              </span>
+              <span class="text-[10px] bg-cocoa-200 text-cocoa-800 font-bold px-2 py-0.5 rounded-full">Fat</span>
+            </div>
+            <div class="flex items-baseline space-x-1 my-1">
+              <span id="totalFatText" class="text-2xl font-extrabold text-cocoa-900">0</span>
+              <span class="text-xs text-cocoa-400">/ <span id="targetFatText">65</span>g</span>
+            </div>
+            <!-- Progress Bar -->
+            <div class="w-full bg-cocoa-100 rounded-full h-2 overflow-hidden mt-3">
+              <div id="fatProgressBar" class="bg-gradient-to-r from-cocoa-500 to-cocoa-700 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Quick Add Preset Items Pills -->
+        <div class="glass-card rounded-3xl p-5 shadow-warm-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-cocoa-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> เมนูด่วนยอดนิยม (Quick Add)
+            </h2>
+            <span class="text-[11px] text-cocoa-400">กดเพื่อใส่ข้อมูลลงฟอร์ม</span>
+          </div>
+          <div id="quickAddContainer" class="flex space-x-2.5 overflow-x-auto custom-scrollbar pb-2 pt-1">
+            <!-- Dynamic presets rendered here -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Interactive Food Logging Form -->
+    <section class="glass-card rounded-3xl p-6 md:p-8 shadow-warm-md space-y-6 relative overflow-hidden">
+      <div class="flex items-center justify-between border-b border-cocoa-200/60 pb-4">
+        <div>
+          <h2 id="formTitle" class="text-lg font-bold text-cocoa-900 flex items-center space-x-2">
+            <i class="fa-solid fa-utensils text-caramel-500"></i>
+            <span>บันทึกมื้ออาหารลง Brownies Food</span>
+          </h2>
+          <p class="text-xs text-cocoa-500 mt-0.5">ระบุรายละเอียดอาหาร สารอาหาร และเลือกมื้อที่ต้องการ</p>
+        </div>
+        <button id="cancelEditBtn" class="hidden text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 font-semibold px-3 py-1.5 rounded-xl transition flex items-center space-x-1">
+          <i class="fa-solid fa-xmark"></i>
+          <span>ยกเลิกการแก้ไข</span>
+        </button>
+      </div>
+
+      <form id="foodForm" class="space-y-5">
+        <input type="hidden" id="editEntryId" value="">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Meal Category -->
+          <div>
+            <label class="block text-xs font-bold text-cocoa-800 mb-1.5">มื้ออาหาร <span class="text-caramel-500">*</span></label>
+            <select id="mealCategory" required class="w-full bg-cream-50 border border-cocoa-200 rounded-2xl px-4 py-3 text-sm text-cocoa-900 focus:outline-none focus:ring-2 focus:ring-caramel-400 transition shadow-inner-glow">
+              <option value="breakfast">🌅 มื้อเช้า (Breakfast)</option>
+              <option value="lunch" selected>☀️ มื้อเที่ยง (Lunch)</option>
+              <option value="dinner">🌙 มื้อเย็น (Dinner)</option>
+              <option value="snack">🍫 อาหารว่าง & บราวนี่ (Snacks)</option>
+            </select>
+          </div>
+
+          <!-- Food Name -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-cocoa-800 mb-1.5">ชื่ออาหาร / เครื่องดื่ม <span class="text-caramel-500">*</span></label>
+            <input type="text" id="foodName" required placeholder="เช่น บราวนี่ดาร์กช็อกโกแลต, ข้าวมันไก่, กาแฟลาเต้" class="w-full bg-cream-50 border border-cocoa-200 rounded-2xl px-4 py-3 text-sm text-cocoa-900 focus:outline-none focus:ring-2 focus:ring-caramel-400 transition shadow-inner-glow placeholder:text-cocoa-300">
+          </div>
+        </div>
+
+        <!-- Macro Inputs -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Calories -->
+          <div>
+            <label class="block text-xs font-bold text-cocoa-800 mb-1.5">แคลอรี (kcal) <span class="text-caramel-500">*</span></label>
+            <input type="number" id="calories" required min="0" placeholder="0" class="w-full bg-cream-50 border border-cocoa-200 rounded-2xl px-4 py-2.5 text-sm font-semibold text-cocoa-900 focus:outline-none focus:ring-2 focus:ring-caramel-400 transition shadow-inner-glow">
+          </div>
+
+          <!-- Protein -->
+          <div>
+            <label class="block text-xs font-bold text-cocoa-800 mb-1.5">โปรตีน (g)</label>
+            <input type="number" id="protein" min="0" step="0.1" placeholder="0" class="w-full bg-cream-50 border border-cocoa-200 rounded-2xl px-4 py-2.5 text-sm text-cocoa-900 focus:outline-none focus:ring-2 focus:ring-caramel-400 transition shadow-inner-glow">
+          </div>
+
+          <!-- Carbs -->
+          <div>
+            <label class="block text-xs font-bold text-cocoa-800 mb-1.5">คาร์โบไฮเดรต (g)</label>
+            <input type="number" id="carbs" min="0" step="0.1" placeholder="0" class="w-full bg-cream-50 border border-cocoa-200 rounded-2xl px-4 py-2.5 text-sm text-cocoa-900 focus:outline-none focus:ring-2 focus:ring-caramel-400 transition shadow-inner-glow">
+          </div>
+
+          <!-- Fat -->
+          <div>
+            <label class="block text-xs font-bold text-cocoa-800 mb-1.5">ไขมัน (g)</label>
+            <input type="number" id="fat" min="0" step="0.1" placeholder="0" class="w-full bg-cream-50 border border-cocoa-200 rounded-2xl px-4 py-2.5 text-sm text-cocoa-900 focus:outline-none focus:ring-2 focus:ring-caramel-400 transition shadow-inner-glow">
+          </div>
+        </div>
+
+        <button type="submit" id="submitFormBtn" class="w-full bg-gradient-to-r from-cocoa-800 via-cocoa-700 to-caramel-600 hover:from-cocoa-900 hover:to-caramel-500 text-cream-100 font-bold py-3.5 px-6 rounded-2xl shadow-warm-md hover:shadow-warm-lg transition-all active:scale-[0.99] flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-plus-circle text-amber-300 text-base"></i>
+          <span>บันทึกรายการอาหาร</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Daily Meal History Grouped Section -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-cocoa-900 flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-caramel-500"></i>
+          <span>รายการอาหารประจำวัน</span>
+        </h2>
+        <span id="logCountBadge" class="text-xs bg-cocoa-100 text-cocoa-800 font-bold px-3 py-1 rounded-full border border-cocoa-200/60 shadow-2xs">0 รายการ</span>
+      </div>
+
+      <div id="mealLogsContainer" class="space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Goal Customization Modal -->
+  <div id="goalModal" class="fixed inset-0 bg-cocoa-950/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl space-y-6 border border-cocoa-200 my-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="flex justify-between items-center border-b border-cocoa-100 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-cocoa-900 flex items-center space-x-2">
+            <i class="fa-solid fa-bullseye text-caramel-500"></i>
+            <span>ตั้งค่าเป้าหมายแคลอรี & สารอาหาร</span>
+          </h3>
+          <p class="text-xs text-cocoa-500 mt-0.5">กำหนดเป้าหมายประจำวันตามความต้องการของคุณ</p>
+        </div>
+        <button id="closeGoalModalBtn" class="w-8 h-8 rounded-full bg-cocoa-50 hover:bg-cocoa-100 text-cocoa-500 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- BMR / TDEE Calculator -->
+      <div class="bg-gradient-to-br from-cream-100 to-cocoa-50 border border-cocoa-200 rounded-2xl p-4 space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold text-cocoa-900 flex items-center space-x-1.5">
+            <i class="fa-solid fa-calculator text-caramel-500"></i>
+            <span>คำนวณอัตโนมัติ (BMR & TDEE Calculator)</span>
+          </span>
+          <button type="button" id="toggleCalcBtn" class="text-xs text-caramel-600 hover:underline font-semibold">
+            ซ่อน/แสดง
+          </button>
+        </div>
+
+        <div id="calcFormContainer" class="space-y-3 pt-1">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-bold text-cocoa-700 mb-1">เพศ</label>
+              <select id="calcGender" class="w-full bg-white border border-cocoa-200 rounded-xl px-2.5 py-2 text-xs text-cocoa-900 focus:ring-1 focus:ring-caramel-400">
+                <option value="male">ชาย</option>
+                <option value="female">หญิง</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-cocoa-700 mb-1">อายุ (ปี)</label>
+              <input type="number" id="calcAge" placeholder="25" class="w-full bg-white border border-cocoa-200 rounded-xl px-2.5 py-2 text-xs text-cocoa-900 focus:ring-1 focus:ring-caramel-400">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-cocoa-700 mb-1">น้ำหนัก (kg)</label>
+              <input type="number" id="calcWeight" placeholder="60" class="w-full bg-white border border-cocoa-200 rounded-xl px-2.5 py-2 text-xs text-cocoa-900 focus:ring-1 focus:ring-caramel-400">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-cocoa-700 mb-1">ส่วนสูง (cm)</label>
+              <input type="number" id="calcHeight" placeholder="165" class="w-full bg-white border border-cocoa-200 rounded-xl px-2.5 py-2 text-xs text-cocoa-900 focus:ring-1 focus:ring-caramel-400">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-cocoa-700 mb-1">ระดับกิจกรรมประจำวัน</label>
+            <select id="calcActivity" class="w-full bg-white border border-cocoa-200 rounded-xl px-2.5 py-2 text-xs text-cocoa-900 focus:ring-1 focus:ring-caramel-400">
+              <option value="1.2">นั่งทำงานเป็นหลัก ออกกำลังกายน้อยมาก</option>
+              <option value="1.375">ออกกำลังกายเบาๆ 1-3 วัน/สัปดาห์</option>
+              <option value="1.55" selected>ออกกำลังกายปานกลาง 3-5 วัน/สัปดาห์</option>
+              <option value="1.725">ออกกำลังกายหนัก 6-7 วัน/สัปดาห์</option>
+            </select>
+          </div>
+
+          <button type="button" id="btnCalculateTDEE" class="w-full bg-cocoa-800 hover:bg-cocoa-900 text-cream-100 text-xs font-bold py-2.5 rounded-xl transition shadow-warm-sm">
+            คำนวณและกรอกค่าเป้าหมายให้อัตโนมัติ
+          </button>
+        </div>
+      </div>
+
+      <!-- Goal Inputs -->
+      <form id="goalForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-cocoa-800 mb-1.5">เป้าหมายแคลอรีประจำวัน (kcal) <span class="text-caramel-500">*</span></label>
+          <input type="number" id="dailyGoalInput" required min="500" max="10000" class="w-full bg-cream-50 border border-cocoa-200 rounded-2xl px-4 py-3 text-base font-extrabold text-cocoa-900 focus:outline-none focus:ring-2 focus:ring-caramel-400 transition shadow-inner-glow">
+        </div>
+
+        <div class="border-t border-cocoa-100 pt-4 space-y-3">
+          <label class="block text-xs font-bold text-cocoa-900">เป้าหมายสารอาหารหลัก (Macronutrients Target)</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-amber-700 mb-1">โปรตีน (g)</label>
+              <input type="number" id="targetProteinInput" required min="0" class="w-full bg-cream-50 border border-cocoa-200 rounded-xl px-3 py-2 text-xs font-semibold text-cocoa-900 focus:ring-2 focus:ring-amber-400">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-caramel-700 mb-1">คาร์บ (g)</label>
+              <input type="number" id="targetCarbsInput" required min="0" class="w-full bg-cream-50 border border-cocoa-200 rounded-xl px-3 py-2 text-xs font-semibold text-cocoa-900 focus:ring-2 focus:ring-caramel-400">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-cocoa-700 mb-1">ไขมัน (g)</label>
+              <input type="number" id="targetFatInput" required min="0" class="w-full bg-cream-50 border border-cocoa-200 rounded-xl px-3 py-2 text-xs font-semibold text-cocoa-900 focus:ring-2 focus:ring-cocoa-500">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-3">
+          <button type="button" id="cancelGoalBtn" class="px-5 py-2.5 text-xs font-semibold text-cocoa-600 hover:bg-cocoa-50 rounded-xl transition">ยกเลิก</button>
+          <button type="submit" class="px-6 py-2.5 text-xs bg-gradient-to-r from-cocoa-800 to-caramel-600 hover:from-cocoa-900 hover:to-caramel-500 text-white font-bold rounded-xl transition shadow-warm-md">บันทึกเป้าหมาย</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script>
+    // Quick Add Presets (Thai Dishes + Brownie Delights)
+    const THAI_FOOD_PRESETS = [
+      { name: 'บราวนี่ช็อกโกแลต (1 ชิ้น)', category: 'snack', cal: 240, protein: 3, carbs: 32, fat: 12 },
+      { name: 'ข้าวมันไก่', category: 'lunch', cal: 590, protein: 24, carbs: 68, fat: 23 },
+      { name: 'ก๋วยเตี๋ยวเรือน้ำตก', category: 'lunch', cal: 380, protein: 18, carbs: 45, fat: 12 },
+      { name: 'อกไก่ต้ม (100g)', category: 'lunch', cal: 165, protein: 31, carbs: 0, fat: 3.6 },
+      { name: 'ข้าวผัดกุ้ง', category: 'dinner', cal: 550, protein: 20, carbs: 65, fat: 21 },
+      { name: 'ผัดไทยกุ้งสด', category: 'lunch', cal: 600, protein: 18, carbs: 70, fat: 26 },
+      { name: 'ส้มตำไทย', category: 'lunch', cal: 120, protein: 3, carbs: 25, fat: 1 },
+      { name: 'ไข่ดาว (1 ฟอง)', category: 'breakfast', cal: 120, protein: 6, carbs: 0.5, fat: 10 },
+      { name: 'อเมริกาโน่เย็น (ไม่หวาน)', category: 'snack', cal: 15, protein: 0.3, carbs: 3, fat: 0 },
+    ];
+
+    // Meal Categories Config
+    const MEAL_CATEGORIES = {
+      breakfast: { label: 'มื้อเช้า', icon: 'fa-sun text-amber-500', bg: 'bg-amber-50/60' },
+      lunch: { label: 'มื้อเที่ยง', icon: 'fa-cloud-sun text-caramel-500', bg: 'bg-caramel-50/60' },
+      dinner: { label: 'มื้อเย็น', icon: 'fa-moon text-cocoa-600', bg: 'bg-cocoa-100/60' },
+      snack: { label: 'อาหารว่าง & บราวนี่', icon: 'fa-cookie text-amber-600', bg: 'bg-amber-100/40' }
+    };
+
+    // Application State
+    let currentDateStr = getFormattedDate(new Date());
+    let userGoals = {
+      calories: 2000,
+      protein: 100,
+      carbs: 250,
+      fat: 65
+    };
+    let foodEntries = [];
+
+    // DOM References
+    const selectedDateInput = document.getElementById('selectedDateInput');
+    const dateDisplayLabel = document.getElementById('dateDisplayLabel');
+    const prevDayBtn = document.getElementById('prevDayBtn');
+    const nextDayBtn = document.getElementById('nextDayBtn');
+    const todayBtn = document.getElementById('todayBtn');
+
+    const totalCaloriesText = document.getElementById('totalCaloriesText');
+    const targetCaloriesText = document.getElementById('targetCaloriesText');
+    const remainingCaloriesText = document.getElementById('remainingCaloriesText');
+    const remainingCaloriesLabel = document.getElementById('remainingCaloriesLabel');
+    const calorieStatusBadge = document.getElementById('calorieStatusBadge');
+    const ringProgressCircle = document.getElementById('ringProgressCircle');
+    const progressPercentageText = document.getElementById('progressPercentageText');
+
+    const totalProteinText = document.getElementById('totalProteinText');
+    const totalCarbsText = document.getElementById('totalCarbsText');
+    const totalFatText = document.getElementById('totalFatText');
+    const targetProteinText = document.getElementById('targetProteinText');
+    const targetCarbsText = document.getElementById('targetCarbsText');
+    const targetFatText = document.getElementById('targetFatText');
+
+    const proteinProgressBar = document.getElementById('proteinProgressBar');
+    const carbsProgressBar = document.getElementById('carbsProgressBar');
+    const fatProgressBar = document.getElementById('fatProgressBar');
+
+    const foodForm = document.getElementById('foodForm');
+    const editEntryId = document.getElementById('editEntryId');
+    const formTitle = document.getElementById('formTitle');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const submitFormBtn = document.getElementById('submitFormBtn');
+
+    const mealCategory = document.getElementById('mealCategory');
+    const foodName = document.getElementById('foodName');
+    const calories = document.getElementById('calories');
+    const protein = document.getElementById('protein');
+    const carbs = document.getElementById('carbs');
+    const fat = document.getElementById('fat');
+
+    const mealLogsContainer = document.getElementById('mealLogsContainer');
+    const logCountBadge = document.getElementById('logCountBadge');
+    const quickAddContainer = document.getElementById('quickAddContainer');
+
+    const goalModal = document.getElementById('goalModal');
+    const openGoalModalBtn = document.getElementById('openGoalModalBtn');
+    const closeGoalModalBtn = document.getElementById('closeGoalModalBtn');
+    const cancelGoalBtn = document.getElementById('cancelGoalBtn');
+    const goalForm = document.getElementById('goalForm');
+    const dailyGoalInput = document.getElementById('dailyGoalInput');
+    const targetProteinInput = document.getElementById('targetProteinInput');
+    const targetCarbsInput = document.getElementById('targetCarbsInput');
+    const targetFatInput = document.getElementById('targetFatInput');
+
+    const toggleCalcBtn = document.getElementById('toggleCalcBtn');
+    const calcFormContainer = document.getElementById('calcFormContainer');
+    const btnCalculateTDEE = document.getElementById('btnCalculateTDEE');
+
+    // Helper: Date Formatter (YYYY-MM-DD)
+    function getFormattedDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Helper: Thai Date Label
+    function formatDisplayDate(dateStr) {
+      const today = getFormattedDate(new Date());
+      const date = new Date(dateStr + 'T00:00:00');
+      const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+      const day = date.getDate();
+      const month = thaiMonths[date.getMonth()];
+      const year = date.getFullYear() + 543;
+
+      if (dateStr === today) return `วันนี้ (${day} ${month})`;
+      return `${day} ${month} ${year}`;
+    }
+
+    // Initialize App
+    function initApp() {
+      loadLocalStorage();
+      renderQuickAddPresets();
+      updateDateView();
+      setupEventListeners();
+    }
+
+    // Load LocalStorage
+    function loadLocalStorage() {
+      const savedGoals = localStorage.getItem('brownies_food_goals');
+      if (savedGoals) {
+        try { userGoals = { ...userGoals, ...JSON.parse(savedGoals) }; } catch (e) {}
+      }
+
+      const savedEntries = localStorage.getItem('brownies_food_entries');
+      if (savedEntries) {
+        try { foodEntries = JSON.parse(savedEntries); } catch (e) { foodEntries = []; }
+      }
+    }
+
+    // Save LocalStorage
+    function saveLocalStorage() {
+      localStorage.setItem('brownies_food_goals', JSON.stringify(userGoals));
+      localStorage.setItem('brownies_food_entries', JSON.stringify(foodEntries));
+    }
+
+    // Render Preset Food Pills
+    function renderQuickAddPresets() {
+      quickAddContainer.innerHTML = '';
+      THAI_FOOD_PRESETS.forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'flex-shrink-0 bg-cream-100 hover:bg-cocoa-100/70 text-cocoa-900 border border-cocoa-200/70 rounded-2xl px-3.5 py-2 text-xs flex items-center space-x-2 transition active:scale-95 shadow-warm-sm';
+        btn.innerHTML = `
+          <span class="font-medium">${item.name}</span>
+          <span class="text-cocoa-800 bg-white border border-cocoa-200 px-2 py-0.5 rounded-xl font-bold">${item.cal} kcal</span>
+        `;
+        btn.onclick = () => fillPresetToForm(item);
+        quickAddContainer.appendChild(btn);
+      });
+    }
+
+    function fillPresetToForm(item) {
+      mealCategory.value = item.category;
+      foodName.value = item.name;
+      calories.value = item.cal;
+      protein.value = item.protein;
+      carbs.value = item.carbs;
+      fat.value = item.fat;
+      foodForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Update Dashboard & View according to selected date
+    function updateDateView() {
+      selectedDateInput.value = currentDateStr;
+      dateDisplayLabel.textContent = formatDisplayDate(currentDateStr);
+
+      const dayEntries = foodEntries.filter(e => e.date === currentDateStr);
+      updateDashboard(dayEntries);
+      renderMealLogs(dayEntries);
+    }
+
+    // Dashboard Gauge & Macro Calculations
+    function updateDashboard(dayEntries) {
+      const totals = dayEntries.reduce((acc, curr) => {
+        acc.calories += Number(curr.calories) || 0;
+        acc.protein += Number(curr.protein) || 0;
+        acc.carbs += Number(curr.carbs) || 0;
+        acc.fat += Number(curr.fat) || 0;
+        return acc;
+      }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+
+      // Calorie texts
+      totalCaloriesText.textContent = totals.calories.toLocaleString();
+      targetCaloriesText.textContent = userGoals.calories.toLocaleString();
+
+      const remaining = userGoals.calories - totals.calories;
+      if (remaining >= 0) {
+        remainingCaloriesText.textContent = remaining.toLocaleString();
+        remainingCaloriesText.className = "font-extrabold text-cocoa-900 text-sm";
+        remainingCaloriesLabel.textContent = "แคลอรีที่เหลือทานได้";
+        calorieStatusBadge.textContent = "อยู่ในเกณฑ์ดี";
+        calorieStatusBadge.className = "text-xs font-semibold px-3 py-1 rounded-full bg-amber-100 text-cocoa-800 border border-amber-200/60";
+      } else {
+        const exceeded = Math.abs(remaining);
+        remainingCaloriesText.textContent = `+${exceeded.toLocaleString()}`;
+        remainingCaloriesText.className = "font-extrabold text-rose-600 text-sm";
+        remainingCaloriesLabel.textContent = "แคลอรีเกินเป้าหมาย";
+        calorieStatusBadge.textContent = "ทานเกินเป้าหมาย";
+        calorieStatusBadge.className = "text-xs font-semibold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200";
+      }
+
+      // SVG Ring Progress Calculation (Circumference ~ 314.159)
+      const circumference = 314.159;
+      const percentage = Math.min(Math.round((totals.calories / userGoals.calories) * 100), 100);
+      const strokeDashoffset = circumference - (percentage / 100) * circumference;
+      
+      ringProgressCircle.style.strokeDashoffset = strokeDashoffset;
+      progressPercentageText.textContent = `${percentage}%`;
+
+      // Change stroke color if exceeded
+      if (totals.calories > userGoals.calories) {
+        ringProgressCircle.setAttribute('stroke', '#E11D48');
+      } else {
+        ringProgressCircle.setAttribute('stroke', 'url(#amberGradient)');
+      }
+
+      // Macros text & progress bars
+      totalProteinText.textContent = totals.protein.toFixed(1).replace(/\.0$/, '');
+      totalCarbsText.textContent = totals.carbs.toFixed(1).replace(/\.0$/, '');
+      totalFatText.textContent = totals.fat.toFixed(1).replace(/\.0$/, '');
+
+      targetProteinText.textContent = userGoals.protein;
+      targetCarbsText.textContent = userGoals.carbs;
+      targetFatText.textContent = userGoals.fat;
+
+      const pPct = Math.min(Math.round((totals.protein / (userGoals.protein || 1)) * 100), 100);
+      const cPct = Math.min(Math.round((totals.carbs / (userGoals.carbs || 1)) * 100), 100);
+      const fPct = Math.min(Math.round((totals.fat / (userGoals.fat || 1)) * 100), 100);
+
+      proteinProgressBar.style.width = `${pPct}%`;
+      carbsProgressBar.style.width = `${cPct}%`;
+      fatProgressBar.style.width = `${fPct}%`;
+    }
+
+    // Render Meal History List Grouped by Meal Category
+    function renderMealLogs(dayEntries) {
+      mealLogsContainer.innerHTML = '';
+      logCountBadge.textContent = `${dayEntries.length} รายการ`;
+
+      if (dayEntries.length === 0) {
+        mealLogsContainer.innerHTML = `
+          <div class="glass-card rounded-3xl p-8 text-center space-y-3 shadow-warm-sm">
+            <div class="w-16 h-16 bg-cream-100 text-caramel-500 rounded-2xl flex items-center justify-center mx-auto text-2xl border border-cocoa-200/50 shadow-inner-glow">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <p class="text-cocoa-800 font-bold text-sm">ยังไม่มีรายการบันทึกในวันนี้</p>
+            <p class="text-xs text-cocoa-400">เลือกเมนูด่วนหรือบันทึกมื้ออาหารของคุณได้ที่แบบฟอร์มด้านบน</p>
+          </div>
+        `;
+        return;
+      }
+
+      const categoriesOrder = ['breakfast', 'lunch', 'dinner', 'snack'];
+      
+      categoriesOrder.forEach(catKey => {
+        const catEntries = dayEntries.filter(e => e.category === catKey);
+        if (catEntries.length === 0) return;
+
+        const config = MEAL_CATEGORIES[catKey] || MEAL_CATEGORIES.lunch;
+        const catTotalCal = catEntries.reduce((sum, item) => sum + Number(item.calories || 0), 0);
+
+        const groupEl = document.createElement('div');
+        groupEl.className = 'glass-card rounded-3xl shadow-warm-sm overflow-hidden border border-cocoa-200/60';
+
+        let itemsHTML = catEntries.map(entry => `
+          <div class="p-4 flex items-center justify-between border-b last:border-b-0 border-cocoa-100/60 hover:bg-cream-100/50 transition">
+            <div class="space-y-1">
+              <div class="font-bold text-cocoa-900 text-sm md:text-base">${escapeHtml(entry.name)}</div>
+              <div class="flex flex-wrap items-center gap-2 text-xs text-cocoa-500">
+                <span class="font-extrabold text-cocoa-900 bg-cream-100 border border-cocoa-200 px-2.5 py-0.5 rounded-lg shadow-2xs">${entry.calories} kcal</span>
+                <span>โปรตีน ${entry.protein || 0}g</span> • 
+                <span>คาร์บ ${entry.carbs || 0}g</span> • 
+                <span>ไขมัน ${entry.fat || 0}g</span>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-1">
+              <button onclick="editEntry('${entry.id}')" class="w-9 h-9 text-cocoa-500 hover:text-cocoa-900 hover:bg-cream-200/60 rounded-xl transition flex items-center justify-center" title="แก้ไข">
+                <i class="fa-solid fa-pen-to-square text-xs"></i>
+              </button>
+              <button onclick="deleteEntry('${entry.id}')" class="w-9 h-9 text-cocoa-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center justify-center" title="ลบ">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        groupEl.innerHTML = `
+          <div class="px-5 py-3.5 ${config.bg} border-b border-cocoa-200/60 flex items-center justify-between">
+            <div class="flex items-center space-x-2 font-bold text-cocoa-900 text-sm">
+              <i class="fa-solid ${config.icon}"></i>
+              <span>${config.label}</span>
+            </div>
+            <span class="text-xs font-bold text-cocoa-800 bg-white/90 px-3 py-1 rounded-full border border-cocoa-200/60 shadow-2xs">
+              รวม ${catTotalCal.toLocaleString()} kcal
+            </span>
+          </div>
+          <div class="divide-y divide-cocoa-100/60">
+            ${itemsHTML}
+          </div>
+        `;
+
+        mealLogsContainer.appendChild(groupEl);
+      });
+    }
+
+    // Escape HTML Helper
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    // Event Listeners Setup
+    function setupEventListeners() {
+      // Date Picker Controls
+      selectedDateInput.addEventListener('change', (e) => {
+        if (e.target.value) {
+          currentDateStr = e.target.value;
+          updateDateView();
+        }
+      });
+
+      prevDayBtn.addEventListener('click', () => {
+        const d = new Date(currentDateStr + 'T00:00:00');
+        d.setDate(d.getDate() - 1);
+        currentDateStr = getFormattedDate(d);
+        updateDateView();
+      });
+
+      nextDayBtn.addEventListener('click', () => {
+        const d = new Date(currentDateStr + 'T00:00:00');
+        d.setDate(d.getDate() + 1);
+        currentDateStr = getFormattedDate(d);
+        updateDateView();
+      });
+
+      todayBtn.addEventListener('click', () => {
+        currentDateStr = getFormattedDate(new Date());
+        updateDateView();
+      });
+
+      // Submit Food Entry Form
+      foodForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const id = editEntryId.value;
+        const entryData = {
+          id: id || Date.now().toString(),
+          date: currentDateStr,
+          category: mealCategory.value,
+          name: foodName.value.trim(),
+          calories: parseFloat(calories.value) || 0,
+          protein: parseFloat(protein.value) || 0,
+          carbs: parseFloat(carbs.value) || 0,
+          fat: parseFloat(fat.value) || 0,
+        };
+
+        if (id) {
+          const index = foodEntries.findIndex(e => e.id === id);
+          if (index !== -1) foodEntries[index] = entryData;
+        } else {
+          foodEntries.unshift(entryData);
+        }
+
+        saveLocalStorage();
+        resetForm();
+        updateDateView();
+      });
+
+      cancelEditBtn.addEventListener('click', resetForm);
+
+      // Goal Modal Events
+      openGoalModalBtn.addEventListener('click', () => {
+        dailyGoalInput.value = userGoals.calories;
+        targetProteinInput.value = userGoals.protein;
+        targetCarbsInput.value = userGoals.carbs;
+        targetFatInput.value = userGoals.fat;
+        goalModal.classList.remove('hidden');
+      });
+
+      closeGoalModalBtn.addEventListener('click', () => goalModal.classList.add('hidden'));
+      cancelGoalBtn.addEventListener('click', () => goalModal.classList.add('hidden'));
+
+      toggleCalcBtn.addEventListener('click', () => {
+        calcFormContainer.classList.toggle('hidden');
+      });
+
+      // BMR / TDEE Calculation
+      btnCalculateTDEE.addEventListener('click', () => {
+        const gender = document.getElementById('calcGender').value;
+        const age = parseFloat(document.getElementById('calcAge').value) || 25;
+        const weight = parseFloat(document.getElementById('calcWeight').value) || 60;
+        const height = parseFloat(document.getElementById('calcHeight').value) || 165;
+        const activity = parseFloat(document.getElementById('calcActivity').value) || 1.55;
+
+        // Mifflin-St Jeor Equation
+        let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+        bmr += (gender === 'male') ? 5 : -161;
+
+        const tdee = Math.round(bmr * activity);
+
+        // Standard Macros ratio (Protein 25%, Carbs 50%, Fat 25%)
+        const calculatedProtein = Math.round((tdee * 0.25) / 4);
+        const calculatedCarbs = Math.round((tdee * 0.50) / 4);
+        const calculatedFat = Math.round((tdee * 0.25) / 9);
+
+        dailyGoalInput.value = tdee;
+        targetProteinInput.value = calculatedProtein;
+        targetCarbsInput.value = calculatedCarbs;
+        targetFatInput.value = calculatedFat;
+      });
+
+      // Goal Form Submit
+      goalForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const cal = parseInt(dailyGoalInput.value, 10);
+        const p = parseInt(targetProteinInput.value, 10);
+        const c = parseInt(targetCarbsInput.value, 10);
+        const f = parseInt(targetFatInput.value, 10);
+
+        if (cal && cal > 0) {
+          userGoals = { calories: cal, protein: p || 0, carbs: c || 0, fat: f || 0 };
+          saveLocalStorage();
+          updateDateView();
+          goalModal.classList.add('hidden');
+        }
+      });
+    }
+
+    // Global Edit Trigger
+    window.editEntry = function(id) {
+      const entry = foodEntries.find(e => e.id === id);
+      if (!entry) return;
+
+      editEntryId.value = entry.id;
+      mealCategory.value = entry.category;
+      foodName.value = entry.name;
+      calories.value = entry.calories;
+      protein.value = entry.protein || '';
+      carbs.value = entry.carbs || '';
+      fat.value = entry.fat || '';
+
+      formTitle.innerHTML = '<i class="fa-solid fa-pen-to-square text-caramel-500"></i><span>แก้ไขรายการอาหาร</span>';
+      submitFormBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>บันทึกการแก้ไข</span>';
+      cancelEditBtn.classList.remove('hidden');
+
+      foodForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    // Global Delete Trigger
+    window.deleteEntry = function(id) {
+      foodEntries = foodEntries.filter(e => e.id !== id);
+      saveLocalStorage();
+      updateDateView();
+    };
+
+    // Reset Entry Form
+    function resetForm() {
+      editEntryId.value = '';
+      foodForm.reset();
+      formTitle.innerHTML = '<i class="fa-solid fa-utensils text-caramel-500"></i><span>บันทึกมื้ออาหารลง Brownies Food</span>';
+      submitFormBtn.innerHTML = '<i class="fa-solid fa-plus-circle text-amber-300"></i><span>บันทึกรายการอาหาร</span>';
+      cancelEditBtn.classList.add('hidden');
+    }
+
+    // App Startup
+    window.onload = initApp;
+  </script>
+</body>
+</html>
